@@ -6,16 +6,20 @@
 
 Reading SNI value from QUIC Initial Packet.
 
-# Installation
+# Install
 
 ```shell
-go install github.com/cuonglm/quicsni@latest
+go get github.com/cuonglm/quicsni@latest
 ```
 
 # Usage
 
 See [Examples](https://pkg.go.dev/github.com/cuonglm/quicsni#pkg-examples)
 
+
+# Contributing
+
+See [Contribution Guideline](./CONTRIBUTING.md)
 
 # Author
 
