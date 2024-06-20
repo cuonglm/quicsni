@@ -1,6 +1,7 @@
 package quicsni
 
 import (
+	"context"
 	"crypto/tls"
 	"net"
 	"testing"
@@ -13,10 +14,6 @@ func TestReadClientHello(t *testing.T) {
 		name       string
 		quicConfig *quic.Config
 	}{
-		{
-			"draft29",
-			&quic.Config{Versions: []quic.VersionNumber{quic.VersionDraft29}},
-		},
 		{
 			"v1",
 			&quic.Config{Versions: []quic.VersionNumber{quic.Version1}},
@@ -50,6 +47,7 @@ func runTest(t *testing.T, quicConfig *quic.Config) {
 		tlsConf := &tls.Config{
 			InsecureSkipVerify: true,
 			NextProtos:         []string{"quic"},
+			ServerName:         testHostname,
 		}
 		conn, err := net.ListenUDP("udp", nil)
 		if err != nil {
@@ -59,7 +57,7 @@ func runTest(t *testing.T, quicConfig *quic.Config) {
 		if err != nil {
 			panic(err)
 		}
-		ea, err := quic.Dial(conn, remoteAddr, testHostname, tlsConf, quicConfig)
+		ea, err := quic.Dial(context.Background(), conn, remoteAddr, tlsConf, quicConfig)
 		if err != nil {
 			panic(err)
 		}
