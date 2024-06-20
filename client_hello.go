@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 
-	"golang.org/x/crypto/hkdf"
-
 	"github.com/quic-go/quic-go/quicvarint"
+	"golang.org/x/crypto/hkdf"
+	"src.agwa.name/tlshacks"
 )
 
 // ReadClientHello parses the packet and return *tls.ClientHelloInfo if found.
@@ -37,21 +37,11 @@ func ReadClientHello(packet []byte) (*tls.ClientHelloInfo, error) {
 		return nil, err
 	}
 
-	rl := &recordLayer{ch: make(chan []byte, 1)}
-	_, _ = rl.WriteRecord(cr.Data)
-
-	var hello *tls.ClientHelloInfo
-	err = newTLSServer(readOnlyConn{r: bytes.NewReader(cr.Data)}, &tlsConfig{
-		GetConfigForClient: func(argHello *tls.ClientHelloInfo) (*tls.Config, error) {
-			hello = new(tls.ClientHelloInfo)
-			*hello = *argHello
-			return nil, nil
-		},
-	}, &tlsExtraConfig{AlternativeRecordLayer: rl}).Handshake()
-	if hello == nil {
-		return nil, err
+	ch := tlshacks.UnmarshalClientHello(cr.Data)
+	if ch != nil && ch.Info.ServerName != nil {
+		return &tls.ClientHelloInfo{ServerName: *ch.Info.ServerName}, nil
 	}
-	return hello, nil
+	return nil, errors.New("no client hello found")
 }
 
 func findCryptoFrame(br *bytes.Reader) (*CryptoFrame, error) {
