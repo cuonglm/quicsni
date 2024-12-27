@@ -16,11 +16,11 @@ func TestReadClientHello(t *testing.T) {
 	}{
 		{
 			"v1",
-			&quic.Config{Versions: []quic.VersionNumber{quic.Version1}},
+			&quic.Config{Versions: []quic.Version{quic.Version1}},
 		},
 		{
 			"v2",
-			&quic.Config{Versions: []quic.VersionNumber{quic.Version2}},
+			&quic.Config{Versions: []quic.Version{quic.Version2}},
 		},
 	}
 
